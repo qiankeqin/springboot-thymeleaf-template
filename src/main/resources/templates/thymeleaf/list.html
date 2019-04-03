@@ -4,13 +4,9 @@
     <div th:replace="head"></div>
     <!-- DataTables -->
     <link rel="stylesheet" th:href="@{/plugins/bootstrap-table/bootstrap-table.min.css}"/>
-    <!--datepicker-->
-    <link rel="stylesheet" th:href="@{/plugins/datepicker/bootstrap-datetimepicker.min.css}"/>
-    <!--selectpicker-->
-    <link rel="stylesheet" th:href="@{/plugins/boostrap-select/bootstrap-select.css}"/>
 
     <meta charset="UTF-8"/>
-    <title>管理</title>
+    <title>跨境场站管理系统</title>
 
     <style>
         tbody td {
@@ -127,13 +123,18 @@
 </head>
 <body class="hold-transition skin-blue sidebar-mini ">
 <div id="wrapper">
-    <div class="content-wrapper" id="page-wrapper" style="padding-bottom:0px;">
-        <div class="panel panel-default" style="margin-bottom:-5px">
+    <div class="" id="page-wrapper" style="padding-bottom:0px;">
+        <div class="panel panel-default" style="margin-bottom:-5px;padding-left:20px;">
             <form id="formSearch" class="form-horizontal">
                 <div class="form-group">
-                    <label class="control-label col-sm-1" for="settle_date">DateTime</label>
-                    <div class="col-sm-3" style="width:165px">
-                        <input id="settle_date" class="form-control"/>
+                    <label class="control-label col-sm-1"  style="text-align:left;width:80px" for="voyageNo">扫描总运单号</label>
+                    <div class="col-sm-3" style="width:250px">
+                        <input id="voyageNo" class="form-control"/>
+                    </div>
+
+                    <label class="control-label col-sm-1" for="billNo">扫描运单号</label>
+                    <div class="col-sm-3" style="width:250px">
+                        <input id="billNo" class="form-control"/>
                     </div>
 
                     <div class="col-sm-3" style="text-align:left;width:60px">
@@ -145,23 +146,32 @@
             </form>
         </div>
         <table id="settleList" style="table-layout: fixed;"></table>
+
+
+        <div class="panel panel-default" style="margin-bottom:-5px; margin-top:5px;padding-left:20px;">
+            <form id="formSearch2" class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-sm-1" style="text-align:left;width:160px">布控待过机清单</label>
+
+                    <div class="col-sm-3" style="text-align:left;width:160px">
+                        <button type="button" style="margin-left:20px" id="btn_query2" class="btn btn-primary">刷新
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
         <table id="settleList2" style="table-layout: fixed;"></table>
     </div>
 </div>
 
 
 <div th:replace="script"></div>
-<!--bootstrap datepicker-->
-<script th:src="@{/plugins/datepicker/bootstrap-datetimepicker.js}"></script>
-<script th:src="@{/plugins/datepicker/bootstrap-datepicker.js}"></script>
-<script th:src="@{/plugins/datepicker/locales/bootstrap-datetimepicker.fr.js}"></script>
-<script th:src="@{/plugins/datepicker/locales/bootstrap-datepicker.zh-CN.js}"></script>
 <!--bootstrap table-->
 <script th:src="@{/plugins/bootstrap-table/bootstrap-table.min.js}"></script>
 <script th:src="@{/plugins/bootstrap-table/bootstrap-table-zh-CN.min.js}"></script>
 
 <script th:src="@{/js/bootbox.min.js}"></script>
-<script th:src="@{/plugins/boostrap-select/bootstrap-select.js}"></script>
 
 <script type="text/javascript">
     $(function () {
@@ -181,6 +191,17 @@
         var oButtonInit = new ButtonInit();
         oButtonInit.Init();
 
+        var oButtonInit2 = new ButtonInit2();
+        oButtonInit2.Init();
+
+        //循环执行，每隔1秒钟执行一次 1000
+        var t1=window.setInterval(refreshCount, 600000);
+
+        function refreshCount() {
+            console.log("刷新");
+            $("#settleList2").bootstrapTable('refreshOptions',{});
+        }
+
     });
 
 
@@ -189,7 +210,7 @@
         //初始化Table
         oTableInit.Init = function () {
             $('#settleList').bootstrapTable({
-                url: '/tbExpInfo/queryExpInfo',         //请求后台的URL（*）
+                url: '/cust/queryCust',         //请求后台的URL（*）
                 method: 'get',                      //请求方式（*）
                 toolbar: '#toolbar',                //工具按钮用哪个容器
                 striped: true,                      //是否显示行间隔色
@@ -213,58 +234,76 @@
                 showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
                 cardView: false,                    //是否显示详细视图
                 detailView: false,                   //是否显示父子表
+                height: $(window).height()*2/5,
                 columns: [
                     {
                         field: 'vOYAGE_NO',
-                        title: '公司code',
+                        title: '总运单号',
                         align: 'center',
                         width: '80px'
                     }, {
                         field: 'bILL_NO',
-                        title: '渠道code',
+                        title: '运单号',
                         align: 'center',
                         width: '200px'
                     }, {
-                        field: 'sEND_NAME',
-                        title: '名称',
+                        field: 'cUST_ORDER',
+                        title: '状态',
+                        align: 'center',
+                        width: '150px',
+                        formatter: function (value, row, index) {
+                            if (value == '0') {
+                                return "放行";
+                            } else if(value == '1') {
+                                return "过机查验";
+                            } else if(value == '2') {
+                                return "过机放行";
+                            }  else {
+                                return "未知("+value+")";
+                            }
+                        }
+                    }, {
+                        field: 'mAIN_G_NAME',
+                        title: '品名',
                         align: 'center',
                         width: '150px'
                     }, {
-                        field: 'sENDER_ADDR',
-                        title: '对公户账号',
-                        align: 'center',
-                        width: '150px'
-                    }, {
-                        field: 'sENDER_TEL',
-                        title: '金额',
+                        field: 'pACK_NO',
+                        title: '件数',
                         align: 'center',
                         width: '100px'
                     },{
-                        field: 'oWNER_NAME',
-                        title: '优惠金额',
+                        field: 'tOTAL_VALUE',
+                        title: '总值',
                         align: 'center',
                         width: '100px'
                     },{
-                        field: 'oWNER_ADDR',
-                        title: '补充金额',
+                        field: 'i_E_FLAG',
+                        title: '进出口标志',
                         align: 'center',
-                        width: '100px'
-                    },{
-                        field: 'oWNER_TEL',
-                        title: '备注',
-                        align: 'center',
-                        width: '100px'
+                        width: '100px',
+                        formatter: function (value, row, index) {
+                            if (value == 'I') {
+                                return "进口";
+                            } else if(value == 'E') {
+                                return "出口";
+                            } else {
+                                return "未知("+value+")";
+                            }
+                        }
                     }]
             });
         };
 
 
         //得到查询的参数
+
+        //得到查询的参数
         oTableInit.queryParams = function (params) {
-            var temp = {   //这里的键的名字和Controller的变量名必须一直，这边改动，Controller也需要改成一样的
-                settle_date: $("#settle_date").val()
+            var temp = {
+                voyageNo: $("#voyageNo").val(),
+                billNo: $("#billNo").val()
             };
-            console.info(temp);
             return temp;
         };
         return oTableInit;
@@ -272,11 +311,11 @@
 
 
     var TableInit2 = function () {
-        var oTableInit = new Object();
+        var oTableInit2 = new Object();
         //初始化Table
-        oTableInit.Init = function () {
+        oTableInit2.Init = function () {
             $('#settleList2').bootstrapTable({
-                url: '/tbExpInfo/queryExpInfo',         //请求后台的URL（*）
+                url: '/cust/queryCustNoLine',         //请求后台的URL（*）
                 method: 'get',                      //请求方式（*）
                 toolbar: '#toolbar',                //工具按钮用哪个容器
                 striped: true,                      //是否显示行间隔色
@@ -284,7 +323,7 @@
                 pagination: true,                   //是否显示分页（*）
                 sortable: false,                     //是否启用排序
                 sortOrder: "asc",                   //排序方式
-                queryParams: oTableInit.queryParams,//传递参数（*）
+                queryParams: oTableInit2.queryParams,//传递参数（*）
                 sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
                 pageNumber: 1,                       //初始化加载第一页，默认第一页
                 pageSize: 50,                       //每页的记录行数（*）
@@ -300,61 +339,64 @@
                 showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
                 cardView: false,                    //是否显示详细视图
                 detailView: false,                   //是否显示父子表
+                height: $(window).height()*2/5,
                 columns: [
                     {
                         field: 'vOYAGE_NO',
-                        title: '公司code',
+                        title: '总运单号',
                         align: 'center',
                         width: '80px'
                     }, {
                         field: 'bILL_NO',
-                        title: '渠道code',
+                        title: '运单号',
                         align: 'center',
                         width: '200px'
                     }, {
-                        field: 'sEND_NAME',
-                        title: '名称',
+                        field: 'tRADE_NAME',
+                        title: '公司名称',
                         align: 'center',
                         width: '150px'
                     }, {
-                        field: 'sENDER_ADDR',
-                        title: '对公户账号',
+                        field: 'mAIN_G_NAME',
+                        title: '品名',
                         align: 'center',
                         width: '150px'
                     }, {
-                        field: 'sENDER_TEL',
-                        title: '金额',
+                        field: 'pACK_NO',
+                        title: '件数',
                         align: 'center',
                         width: '100px'
                     },{
-                        field: 'oWNER_NAME',
-                        title: '优惠金额',
+                        field: 'tOTAL_VALUE',
+                        title: '总值',
                         align: 'center',
                         width: '100px'
                     },{
-                        field: 'oWNER_ADDR',
-                        title: '补充金额',
+                        field: 'i_E_FLAG',
+                        title: '进出口标志',
                         align: 'center',
-                        width: '100px'
-                    },{
-                        field: 'oWNER_TEL',
-                        title: '备注',
-                        align: 'center',
-                        width: '100px'
+                        width: '100px',
+                        formatter: function (value, row, index) {
+                            if (value == 'I') {
+                                return "进口";
+                            } else if(value == 'E') {
+                                return "出口";
+                            } else {
+                                return "未知("+value+")";
+                            }
+                        }
                     }]
             });
         };
 
 
         //得到查询的参数
-        oTableInit.queryParams = function (params) {
+        oTableInit2.queryParams = function (params) {
             var temp = {
-                settle_date: $("#settle_date").val()
             };
-            console.info(temp);
             return temp;
         };
-        return oTableInit;
+        return oTableInit2;
     };
 
     var ButtonInit = function () {
@@ -366,8 +408,45 @@
             //查询按钮
             $("#btn_query").click(function () {
                 //查询
-                var settle_date= $("#settle_date").val();
-                $("#settleList").bootstrapTable('refreshOptions',{});
+                var voyageNo= $("#voyageNo").val();
+                var billNo= $("#billNo").val();
+                $("#settleList").bootstrapTable('refreshOptions',{voyageNo:voyageNo,billNo:billNo});
+            });
+
+        };
+
+        $('#voyageNo').bind('keyup', function(event) {
+            if (event.keyCode == "13") {
+                //查询
+                var voyageNo= $("#voyageNo").val();
+                var billNo= $("#billNo").val();
+                $("#settleList").bootstrapTable('refreshOptions',{voyageNo:voyageNo,billNo:billNo});
+            }
+        });
+
+        $('#billNo').bind('keyup', function(event) {
+            if (event.keyCode == "13") {
+                //查询
+                var voyageNo= $("#voyageNo").val();
+                var billNo= $("#billNo").val();
+                $("#settleList").bootstrapTable('refreshOptions',{voyageNo:voyageNo,billNo:billNo});
+            }
+        });
+
+        return oInit;
+    };
+
+
+    var ButtonInit2 = function () {
+        var oInit = new Object();
+        var postdata = {};
+
+        oInit.Init = function () {
+            //初始化页面上面的按钮事件
+            //查询按钮
+            $("#btn_query2").click(function () {
+                //查询
+                $("#settleList2").bootstrapTable('refreshOptions',{});
             });
 
         };

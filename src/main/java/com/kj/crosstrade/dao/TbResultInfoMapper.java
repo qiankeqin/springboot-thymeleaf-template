@@ -12,7 +12,8 @@ import java.util.List;
  * @date 2019-04-03 13:53
  */
 @Repository
-public interface TbExpInfoMapper {
+public interface TbResultInfoMapper {
 
-    List<TbExpInfo> queryByVoyageNoOrBillNo(@Param(value="VOYAGE_NO") String VOYAGE_NO, @Param(value="BILL_NO") String BILL_NO);
+    List<TbExpInfo> getCustButNoLine();
+
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.kj.crosstrade.dao.TbExpInfoMapper">
+<mapper namespace="com.kj.crosstrade.dao.TbResultInfoMapper">
 
     <resultMap id="tbExpInfoMap" type="com.kj.crosstrade.domain.TbExpInfo">
         <result property="VOYAGE_NO" column="VOYAGE_NO" javaType="java.lang.String"></result>
@@ -26,16 +26,13 @@
         <result property="READ_MARK" column="READ_MARK" javaType="java.lang.Integer"></result>
     </resultMap>
 
-    <select id="queryByVoyageNoOrBillNo" resultMap="tbExpInfoMap">
-
-        select * from tb_ExpInfo where 1=1
-        <if test="VOYAGE_NO != null  and VOYAGE_NO !=''" >
-            and VOYAGE_NO=#{VOYAGE_NO}
-        </if>
-
-        <if test="BILL_NO != null  and BILL_NO !=''" >
-            and BILL_NO=#{BILL_NO}
-        </if>
+    <select id="getCustButNoLine" resultMap="tbExpInfoMap">
+      select a.* from tb_ExpInfo a left join tb_ResultInfo b
+        on a.VOYAGE_NO=b.VOYAGE_NO
+        and a.BILL_NO=b.BILL_NO
+        and a.TRADE_CODE=b.TRADE_CODE
+        where cust_order in ('1','2')
+        and b.TRADE_CODE is null
     </select>
 
 </mapper>

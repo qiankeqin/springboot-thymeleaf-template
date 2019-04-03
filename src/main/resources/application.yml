@@ -2,7 +2,7 @@ server.port: 8080
 spring:
   datasource:
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    url: jdbc:sqlserver://rm-m5e3jljh50rwl8m18bo.sqlserver.rds.aliyuncs.com:3433;Databasename=aslog
+    url: jdbc:sqlserver://rm-m5e3353jy02cidl21eo.sqlserver.rds.aliyuncs.com:3433;Databasename=aslog
     username: sasa
     password: Sa123456
 #  jpa:
