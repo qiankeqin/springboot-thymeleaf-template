@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kj.crosstrade.dao.TbExpInfoMapper">
+
+    <resultMap id="tbExpInfoMap" type="com.kj.crosstrade.domain.TbExpInfo">
+        <result property="VOYAGE_NO" column="VOYAGE_NO" javaType="java.lang.String"></result>
+        <result property="BILL_NO" column="BILL_NO" javaType="java.lang.String"></result>
+        <result property="SEND_NAME" column="SEND_NAME" javaType="java.lang.String"></result>
+        <result property="SENDER_ADDR" column="SENDER_ADDR" javaType="java.lang.String"></result>
+        <result property="SENDER_TEL" column="SENDER_TEL" javaType="java.lang.String"></result>
+        <result property="OWNER_NAME" column="OWNER_NAME" javaType="java.lang.String"></result>
+        <result property="OWNER_ADDR" column="OWNER_ADDR" javaType="java.lang.String"></result>
+        <result property="OWNER_TEL" column="OWNER_TEL" javaType="java.lang.String"></result>
+        <result property="MAIN_G_NAME" column="MAIN_G_NAME" javaType="java.lang.String"></result>
+        <result property="PACK_NO" column="PACK_NO" javaType="java.lang.Integer"></result>
+        <result property="TOTAL_VALUE" column="TOTAL_VALUE" javaType="java.math.BigDecimal"></result>
+        <result property="CURR_CODE" column="CURR_CODE" javaType="java.lang.String"></result>
+        <result property="GROSS_WT" column="GROSS_WT" javaType="java.math.BigDecimal"></result>
+        <result property="TAX_FLAG" column="TAX_FLAG" javaType="java.lang.String"></result>
+        <result property="I_E_FLAG" column="I_E_FLAG" javaType="java.lang.String"></result>
+        <result property="CUST_DATE" column="CUST_DATE" javaType="java.util.Date"></result>
+        <result property="CUST_ER" column="CUST_ER" javaType="java.lang.String"></result>
+        <result property="TRADE_NAME" column="TRADE_NAME" javaType="java.lang.String"></result>
+        <result property="TRADE_CODE" column="TRADE_CODE" javaType="java.lang.String"></result>
+        <result property="READ_MARK" column="READ_MARK" javaType="java.lang.Integer"></result>
+    </resultMap>
+
+    <select id="getExpInfoById" resultMap="tbExpInfoMap">
+        select * from tb_ExpInfo where VOYAGE_NO=#{VOYAGE_NO}
+    </select>
+    <select id="getExpInfoList" resultMap="tbExpInfoMap">
+        select * from tb_ExpInfo
+    </select>
+
+</mapper>

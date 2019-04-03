@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="head"></div>
+    <!-- DataTables -->
+    <link rel="stylesheet" th:href="@{/plugins/bootstrap-table/bootstrap-table.min.css}"/>
+    <!--datepicker-->
+    <link rel="stylesheet" th:href="@{/plugins/datepicker/bootstrap-datetimepicker.min.css}"/>
+    <!--selectpicker-->
+    <link rel="stylesheet" th:href="@{/plugins/boostrap-select/bootstrap-select.css}"/>
+
+    <meta charset="UTF-8"/>
+    <title>管理</title>
+
+    <style>
+        tbody td {
+            text-align: center;
+        }
+
+        .Wdate[readonly] {
+            background-color: white;
+        }
+
+        .form-group a {
+            margin-left: 10px;
+        }
+
+        #tradedetailQueryForm {
+            margin-bottom: 10px;
+            padding: 10px 66px;
+            background: #f5f5f5;
+        }
+
+        #page-wrapper {
+            padding: 10px 30px;
+        }
+
+        #tradedetailQueryForm label {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        #tradedetailQueryForm .form-group {
+            margin-bottom: 10px;
+        }
+
+        #tradedetailTable td:last-child a {
+            margin-left: 5px;
+        }
+
+        #tradedetailTable td,
+        #tradedetailTable th {
+            white-space: nowrap !important;
+        }
+
+        .split-line {
+            float: left;
+            text-align: center;
+            padding-top: 7px;
+        }
+
+        .navsummary {
+            display: inline;
+            padding-left: 2px;
+            padding-right: 2px;
+            line-height: 2.5;
+        }
+
+        .table-wrapper {
+            height: 30vh;
+            overflow: auto;
+            white-space: nowrap;
+        }
+        .control-label {
+            width: 70px;
+            font-size: 5px;
+            padding: 0px;
+        }
+
+        .col-sm-3 {
+            width: 180px;
+            padding-right: 0px;
+            padding-left: 5px;
+        }
+
+        .form-group {
+            margin: 5px;
+        }
+
+        .content {
+            margin: 50px auto;
+            border: 1px solid #ccc;
+        }
+
+        .operation {
+            margin: 10px;
+        }
+
+        .operation > button {
+            margin: 10px;
+        }
+
+        #books_length {
+            float: left;
+            margin-left: 20px;
+        }
+
+        #books_filter {
+            float: right;
+            margin-right: 20px;
+        }
+
+        #books {
+            margin: 5px;
+        }
+
+        .modal-content{
+            width:350px;
+        }
+
+        .col-sm-10{
+            width:250px;
+        }
+
+
+    </style>
+</head>
+<body class="hold-transition skin-blue sidebar-mini ">
+<div id="wrapper">
+    <div class="content-wrapper" id="page-wrapper" style="padding-bottom:0px;">
+        <div class="panel panel-default" style="margin-bottom:-5px">
+            <form id="formSearch" class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-sm-1" for="settle_date">DateTime</label>
+                    <div class="col-sm-3" style="width:165px">
+                        <input id="settle_date" class="form-control"/>
+                    </div>
+
+                    <div class="col-sm-3" style="text-align:left;width:60px">
+                        <button type="button" style="margin-left:20px" id="btn_query" class="btn btn-primary">查询
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <table id="settleList" style="table-layout: fixed;"></table>
+        <table id="settleList2" style="table-layout: fixed;"></table>
+    </div>
+</div>
+
+
+<div th:replace="script"></div>
+<!--bootstrap datepicker-->
+<script th:src="@{/plugins/datepicker/bootstrap-datetimepicker.js}"></script>
+<script th:src="@{/plugins/datepicker/bootstrap-datepicker.js}"></script>
+<script th:src="@{/plugins/datepicker/locales/bootstrap-datetimepicker.fr.js}"></script>
+<script th:src="@{/plugins/datepicker/locales/bootstrap-datepicker.zh-CN.js}"></script>
+<!--bootstrap table-->
+<script th:src="@{/plugins/bootstrap-table/bootstrap-table.min.js}"></script>
+<script th:src="@{/plugins/bootstrap-table/bootstrap-table-zh-CN.min.js}"></script>
+
+<script th:src="@{/js/bootbox.min.js}"></script>
+<script th:src="@{/plugins/boostrap-select/bootstrap-select.js}"></script>
+
+<script type="text/javascript">
+    $(function () {
+
+        //0.初始化控件
+        // var oButtonStyleInit = new ButtonStyleInit();
+        // oButtonStyleInit.Init();
+
+        //1.初始化Table
+        var oTable = new TableInit();
+        oTable.Init();
+
+        var oTable2 = new TableInit2();
+        oTable2.Init();
+
+        //2.初始化Button的点击事件
+        var oButtonInit = new ButtonInit();
+        oButtonInit.Init();
+
+    });
+
+
+    var TableInit = function () {
+        var oTableInit = new Object();
+        //初始化Table
+        oTableInit.Init = function () {
+            $('#settleList').bootstrapTable({
+                url: '/tbExpInfo/queryExpInfo',         //请求后台的URL（*）
+                method: 'get',                      //请求方式（*）
+                toolbar: '#toolbar',                //工具按钮用哪个容器
+                striped: true,                      //是否显示行间隔色
+                cache: true,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: true,                   //是否显示分页（*）
+                sortable: false,                     //是否启用排序
+                sortOrder: "asc",                   //排序方式
+                queryParams: oTableInit.queryParams,//传递参数（*）
+                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber: 1,                       //初始化加载第一页，默认第一页
+                pageSize: 50,                       //每页的记录行数（*）
+                pageList: [50, 100],        //可供选择的每页的行数（*）
+                search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+                strictSearch: true,
+                showColumns: false,                  //是否显示所有的列
+                showRefresh: false,                  //是否显示刷新按钮
+                minimumCountColumns: 2,             //最少允许的列数
+                clickToSelect: true,                //是否启用点击选中行
+                height: 600,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                uniqueId: "VOYAGE_NO",                     //每一行的唯一标识，一般为主键列
+                showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                cardView: false,                    //是否显示详细视图
+                detailView: false,                   //是否显示父子表
+                columns: [
+                    {
+                        field: 'vOYAGE_NO',
+                        title: '公司code',
+                        align: 'center',
+                        width: '80px'
+                    }, {
+                        field: 'bILL_NO',
+                        title: '渠道code',
+                        align: 'center',
+                        width: '200px'
+                    }, {
+                        field: 'sEND_NAME',
+                        title: '名称',
+                        align: 'center',
+                        width: '150px'
+                    }, {
+                        field: 'sENDER_ADDR',
+                        title: '对公户账号',
+                        align: 'center',
+                        width: '150px'
+                    }, {
+                        field: 'sENDER_TEL',
+                        title: '金额',
+                        align: 'center',
+                        width: '100px'
+                    },{
+                        field: 'oWNER_NAME',
+                        title: '优惠金额',
+                        align: 'center',
+                        width: '100px'
+                    },{
+                        field: 'oWNER_ADDR',
+                        title: '补充金额',
+                        align: 'center',
+                        width: '100px'
+                    },{
+                        field: 'oWNER_TEL',
+                        title: '备注',
+                        align: 'center',
+                        width: '100px'
+                    }]
+            });
+        };
+
+
+        //得到查询的参数
+        oTableInit.queryParams = function (params) {
+            var temp = {   //这里的键的名字和Controller的变量名必须一直，这边改动，Controller也需要改成一样的
+                settle_date: $("#settle_date").val()
+            };
+            console.info(temp);
+            return temp;
+        };
+        return oTableInit;
+    };
+
+
+    var TableInit2 = function () {
+        var oTableInit = new Object();
+        //初始化Table
+        oTableInit.Init = function () {
+            $('#settleList2').bootstrapTable({
+                url: '/tbExpInfo/queryExpInfo',         //请求后台的URL（*）
+                method: 'get',                      //请求方式（*）
+                toolbar: '#toolbar',                //工具按钮用哪个容器
+                striped: true,                      //是否显示行间隔色
+                cache: true,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: true,                   //是否显示分页（*）
+                sortable: false,                     //是否启用排序
+                sortOrder: "asc",                   //排序方式
+                queryParams: oTableInit.queryParams,//传递参数（*）
+                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber: 1,                       //初始化加载第一页，默认第一页
+                pageSize: 50,                       //每页的记录行数（*）
+                pageList: [50, 100],        //可供选择的每页的行数（*）
+                search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+                strictSearch: true,
+                showColumns: false,                  //是否显示所有的列
+                showRefresh: false,                  //是否显示刷新按钮
+                minimumCountColumns: 2,             //最少允许的列数
+                clickToSelect: true,                //是否启用点击选中行
+                height: 600,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                uniqueId: "VOYAGE_NO",                     //每一行的唯一标识，一般为主键列
+                showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                cardView: false,                    //是否显示详细视图
+                detailView: false,                   //是否显示父子表
+                columns: [
+                    {
+                        field: 'vOYAGE_NO',
+                        title: '公司code',
+                        align: 'center',
+                        width: '80px'
+                    }, {
+                        field: 'bILL_NO',
+                        title: '渠道code',
+                        align: 'center',
+                        width: '200px'
+                    }, {
+                        field: 'sEND_NAME',
+                        title: '名称',
+                        align: 'center',
+                        width: '150px'
+                    }, {
+                        field: 'sENDER_ADDR',
+                        title: '对公户账号',
+                        align: 'center',
+                        width: '150px'
+                    }, {
+                        field: 'sENDER_TEL',
+                        title: '金额',
+                        align: 'center',
+                        width: '100px'
+                    },{
+                        field: 'oWNER_NAME',
+                        title: '优惠金额',
+                        align: 'center',
+                        width: '100px'
+                    },{
+                        field: 'oWNER_ADDR',
+                        title: '补充金额',
+                        align: 'center',
+                        width: '100px'
+                    },{
+                        field: 'oWNER_TEL',
+                        title: '备注',
+                        align: 'center',
+                        width: '100px'
+                    }]
+            });
+        };
+
+
+        //得到查询的参数
+        oTableInit.queryParams = function (params) {
+            var temp = {
+                settle_date: $("#settle_date").val()
+            };
+            console.info(temp);
+            return temp;
+        };
+        return oTableInit;
+    };
+
+    var ButtonInit = function () {
+        var oInit = new Object();
+        var postdata = {};
+
+        oInit.Init = function () {
+            //初始化页面上面的按钮事件
+            //查询按钮
+            $("#btn_query").click(function () {
+                //查询
+                var settle_date= $("#settle_date").val();
+                $("#settleList").bootstrapTable('refreshOptions',{});
+            });
+
+        };
+
+        return oInit;
+    };
+
+
+    var ButtonStyleInit = function () {
+        var oInit = new Object();
+        var postdata = {};
+
+
+
+        return oInit;
+    };
+
+</script>
+
+</body>
+</html>
