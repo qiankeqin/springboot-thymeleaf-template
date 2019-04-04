@@ -2,7 +2,7 @@ server.port: 8080
 spring:
   datasource:
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    url: jdbc:sqlserver://rm-m5ei12z4o5hq1dya63o.sqlserver.rds.aliyuncs.com:3433;Databasename=aslog
+    url: jdbc:sqlserver://localhost.sqlserver.rds.aliyuncs.com:3433;Databasename=aslog
     username: sasa
     password: Sa123456
   thymeleaf:
